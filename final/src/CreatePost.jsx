@@ -38,35 +38,36 @@ function CreatePost() {
 		});
 	};
 
+	const { text, file } = postSubmission;
+
 	return (
 		<div className="Post">
 			<div className="post-header">
 				<label htmlFor="post-text">Create a Post</label>
 			</div>
-			<div className="post-submission">
-				<input
-					type="text"
+			<div className="post-body">
+				<textarea
 					id="post-text"
 					name="text"
 					placeholder="What's on Your Mind?"
-					value={postSubmission.text}
+					value={text}
 					onChange={handleChange}
 				/>
-				<img src={postSubmission.file} id="image-preview" />
+				<img src={file} className="post-image" />
 				<div className="post-details">
 					<label
 						id="mediaCaptureLabel"
 						htmlFor="mediaCapture"
 						className="icon-container"
 					>
-						<i class="fas fa-photo-video"></i>
-						<p>Photo/Video</p>
+						<i class="fas fa-image"></i>
+						<p>Upload Photo</p>
 					</label>
 					<input
 						type="file"
 						name="file"
 						id="mediaCapture"
-						accept="image/*|video/*"
+						accept="image/*"
 						capture="camera"
 						onChange={handleFileChange}
 					/>

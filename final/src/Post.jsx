@@ -6,10 +6,12 @@ function Post(props) {
 	return (
 		<div className="Post">
 			<div className="post-header">
+				<img src={profilePic} alt="acc-img" />
 				<p className="post-author">{author}</p>
 			</div>
 			<div className="post-body">
 				<p>{text}</p>
+				<img src={file} className="post-image" />
 			</div>
 			<div className="post-details">
 				<i class="fas fa-edit"></i>
