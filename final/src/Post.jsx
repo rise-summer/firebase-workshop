@@ -1,4 +1,8 @@
 import React from "react";
+<<<<<<< HEAD
+=======
+import "./Post.css";
+>>>>>>> 6ff5acca8ef14b56ad669b49b1741eddb08b815e
 
 function Post(props) {
 	const { author, profilePic, text, file } = props;
