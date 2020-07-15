@@ -147,7 +147,7 @@ Every document in your database is identified by some unique name within its
 collection. Each document stores a set of data in the form of **key-value pairs,**
 which might look something like this:
 
-![]
+![firebase-model](./images/firebase_model_example.png)
 
 Each piece of data is labeled by a field name or **key**, and this key identifies
 what the **value** it maps to represents.
