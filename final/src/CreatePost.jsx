@@ -3,9 +3,9 @@ import React, { useState } from "react";
 function CreatePost({ submitPost }) {
 	const INITIAL_STATE = {
 		author: "Anonymous",
-		profilePic: null,
 		text: "",
-		file: null,
+		profilePicURL: null,
+		imageURL: null,
 	};
 	const [postSubmission, setPostSubmission] = useState(INITIAL_STATE);
 
@@ -37,12 +37,12 @@ function CreatePost({ submitPost }) {
 		setPostSubmission((prev) => {
 			return {
 				...prev,
-				file: URL.createObjectURL(file),
+				file: URL.createObjectURL(imageURL),
 			};
 		});
 	};
 
-	const { text, file } = postSubmission;
+	const { text, imageURL } = postSubmission;
 
 	return (
 		<div className="Post">
@@ -57,7 +57,7 @@ function CreatePost({ submitPost }) {
 					value={text}
 					onChange={handleChange}
 				/>
-				<img src={file} className="post-image" />
+				<img src={imageURL} className="post-image" />
 				<div className="post-details">
 					<label
 						id="mediaCaptureLabel"
