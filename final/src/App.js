@@ -1,32 +1,29 @@
 import React, { useState } from "react";
 import "./App.css";
+import Post from "./Post";
+import CreatePost from "./CreatePost";
 
 function App() {
-	const [postData, setPostData] = useState([]);
+	const INITIAL_STATE = [
+		{
+			author: "Miles Wu",
+			profilePic: null,
+			text:
+				"Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus molestiae nemo expedita vero illo officia neque quisquam ab quos magni.",
+			file: null,
+		},
+	];
+	const [postData, setPostData] = useState(INITIAL_STATE);
+
+	const posts = postData.reverse().map((post) => {
+		return <Post {...post} />;
+	});
 
 	return (
 		<div className="App">
 			<div className="container">
-				<div className="new-post">
-					<div className="new-post-header">
-						<label htmlFor="post-text">Create a Post</label>
-					</div>
-					<div className="post-submission">
-						<input
-							type="text"
-							id="post-text"
-							name="postText"
-							placeholder="What's on Your Mind?"
-						/>
-						<div className="post-details">
-							<div className="icon-container">
-								<i class="fas fa-photo-video"></i>
-								<p>Photo/Video</p>
-							</div>
-							<button>Post!</button>
-						</div>
-					</div>
-				</div>
+				<CreatePost />
+				{posts}
 			</div>
 		</div>
 	);
