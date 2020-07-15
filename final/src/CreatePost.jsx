@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function CreatePost() {
+function CreatePost({ submitPost }) {
 	const INITIAL_STATE = {
 		author: "Anonymous",
 		profilePic: null,
@@ -10,8 +10,12 @@ function CreatePost() {
 	const [postSubmission, setPostSubmission] = useState(INITIAL_STATE);
 
 	const handleSubmit = () => {
-		//TODO: Submit post data
 		console.log(postSubmission);
+		submitPost(postSubmission);
+
+		//TODO: Submit post data to firebase
+
+		setPostSubmission(INITIAL_STATE);
 	};
 
 	const handleChange = (event) => {

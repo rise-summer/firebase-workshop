@@ -15,8 +15,13 @@ function App() {
 		},
 	];
 	const [postData, setPostData] = useState(INITIAL_STATE);
+	const submitPost = (post) => {
+		setPostData((prev) => {
+			return [{ ...post }, ...prev];
+		});
+	};
 
-	const posts = postData.reverse().map((post) => {
+	const posts = postData.map((post) => {
 		return <Post {...post} />;
 	});
 
@@ -24,7 +29,7 @@ function App() {
 		<div className="App">
 			<Header />
 			<div className="container">
-				<CreatePost />
+				<CreatePost submitPost={submitPost} />
 				{posts}
 			</div>
 		</div>
