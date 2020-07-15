@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import Post from "./Post";
 import CreatePost from "./CreatePost";
+import Header from "./Header";
 
 function App() {
 	const INITIAL_STATE = [
@@ -21,6 +22,7 @@ function App() {
 
 	return (
 		<div className="App">
+			<Header />
 			<div className="container">
 				<CreatePost />
 				{posts}
