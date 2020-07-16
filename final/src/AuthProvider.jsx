@@ -6,6 +6,7 @@ export const AuthContext = React.createContext();
 function AuthProvider({ children }) {
 	const [currentUser, setCurrentUser] = useState(null);
 
+	// Track changes in AuthState
 	useEffect(() => {
 		auth.onAuthStateChanged((user) => {
 			if (user) {

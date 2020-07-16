@@ -4,6 +4,7 @@ import { db } from "./lib/firebase";
 function Post(props) {
 	const { id, author, text, timestamp, profilePicURL, imageURL } = props;
 
+	// delete post based on id
 	const deletePost = (id) => {
 		db.collection("posts")
 			.doc(id)

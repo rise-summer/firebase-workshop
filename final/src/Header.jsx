@@ -10,8 +10,9 @@ function Header() {
 		return !!currentUser;
 	};
 
+	// Trigger on button click
 	const googleSignIn = () => {
-		// TODO: set up firebase auth
+		// sign out if signed in already
 		if (signedIn()) {
 			firebase
 				.auth()
@@ -21,7 +22,10 @@ function Header() {
 				})
 				.catch((error) => console.error(error));
 		} else {
+			// set up google sign in provider
 			var provider = new firebase.auth.GoogleAuthProvider();
+
+			// sign in with google
 			firebase
 				.auth()
 				.signInWithPopup(provider)
