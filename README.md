@@ -18,10 +18,10 @@
   - [Fetch from Database](https://firebase.google.com/docs/firestore/query-data/get-data)
   - [Listen for Realtime Updates](https://firebase.google.com/docs/firestore/query-data/listen)
   - [Querying Database](https://firebase.google.com/docs/firestore/query-data/queries)
+    then [test and deploy](https://firebase.google.com/docs/hosting/deploying) your app
+- Firebase [Cloud Storage](https://firebase.google.com/docs/storage)
+- Firebase [Authentication](https://firebase.google.com/docs/auth)
 - Firebase Hosting: [initalize firebase](https://firebase.google.com/docs/cli#initialize_a_firebase_project)
-  then [test and deploy](https://firebase.google.com/docs/hosting/deploying) your app
-- Firebase Cloud Storage: store files, images, etc.
-- Firebase Authentication
 
 ## This workshop will cover the following topics:
 
@@ -40,18 +40,11 @@
     - [Add Cloud Storage to Firebase Project](#demo-app-integrating-cloud-storage)
     - Using Cloud Storage in Web App
 - [Authentication](#authentication)
-  - [Tokens](#tokens)
-  - Security Rules
+  - [Security Rules](#firebase-security-rules)
   - Demo App
-    - Add Authentication
-    - Work with Auth in Web App
-    - Set up Security Rules
+    - [Add Authentication](#add-auth-to-firebase-project)
+    - [Work with Auth in Web App](#integrate-auth-into-the-app)
 - [Firebase Hosting](#firebase-hosting)
-  - Firebase CLI
-  - Deploying
-  - Demo App
-    - Add Hosting
-    - Deploy our Web App
 
 ## Getting Started
 
