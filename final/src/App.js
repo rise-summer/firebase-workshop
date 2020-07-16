@@ -4,7 +4,9 @@ import Post from "./Post";
 import CreatePost from "./CreatePost";
 import Header from "./Header";
 
-import { db } from "./lib/firebase";
+import { db, storage } from "./lib/firebase";
+const LOADING_IMAGE_URL =
+	"https://breckenridge.skyrun.com/components/com_jomholiday/assets/images/04-spinner.gif";
 
 function App() {
 	const INITIAL_STATE = [
@@ -50,14 +52,39 @@ function App() {
 	// Add a new document to our "posts" collection
 	const updatePostCollection = (newPost) => {
 		db.collection("posts")
-			.add(newPost)
+			// 1 - Add post to Firestore database
+			.add({
+				author: newPost.author,
+				text: newPost.text,
+				profilePicURL: newPost.profilePicURL,
+				imageURL: newPost.imageFile ? LOADING_IMAGE_URL : null,
+			})
 			.then((docRef) => {
 				// Successful update
 				console.log("New document written with ID: ", docRef.id);
+				// 2 - Upload the image to Cloud Storage.
+				const file = newPost.imageFile;
+				var filePath = "post-images/" + docRef.id + "/" + file.name;
+				return storage
+					.ref(filePath)
+					.put(file)
+					.then((fileSnapshot) => {
+						// 3 - Generate a public URL for the file.
+						return fileSnapshot.ref.getDownloadURL().then((url) => {
+							// 4 - Update the placeholder with the image’s URL.
+							return docRef.update({
+								imageURL: url,
+								storageUri: fileSnapshot.metadata.fullPath,
+							});
+						});
+					});
 			})
 			.catch((error) => {
 				// Error while updating database
-				console.error("Error adding new document: ", error);
+				console.error(
+					"Error adding new document and/or uploading to Cloud storage: ",
+					error,
+				);
 			});
 	};
 

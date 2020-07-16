@@ -5,7 +5,7 @@ function CreatePost({ submitPost }) {
 		author: "Anonymous",
 		text: "",
 		profilePicURL: null,
-		imageURL: null,
+		imageFile: null,
 	};
 	const [postSubmission, setPostSubmission] = useState(INITIAL_STATE);
 
@@ -37,12 +37,13 @@ function CreatePost({ submitPost }) {
 		setPostSubmission((prev) => {
 			return {
 				...prev,
-				file: URL.createObjectURL(imageURL),
+				imageFile: file,
 			};
 		});
 	};
 
-	const { text, imageURL } = postSubmission;
+	const { text, imageFile } = postSubmission;
+	const preview = imageFile ? URL.createObjectURL(imageFile) : null;
 
 	return (
 		<div className="Post">
@@ -57,7 +58,7 @@ function CreatePost({ submitPost }) {
 					value={text}
 					onChange={handleChange}
 				/>
-				<img src={imageURL} className="post-image" />
+				<img src={preview} className="post-image" />
 				<div className="post-details">
 					<label
 						id="mediaCaptureLabel"
