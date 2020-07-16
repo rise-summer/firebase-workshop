@@ -30,24 +30,23 @@
   - [Why Firestore?](#why-firestore)
   - [Firestore Data Model](#understanding-the-firestore-data-model)
   - Demo App
-    - [Setup](#demonstration-integrating-firestore-with-a-react-app)
+    - [Setup](#demo-app-setup-firebase)
     - [Creating Firebase Project with Firestore](#creating-a-firebase-project)
     - [Using Firestore in Web App](#using-the-database-in-the-app)
-- Cloud Storage
-  - Buckets
-  - References
-  - Manipulating Contents of Buckets
+- [Cloud Storage](#cloud-storage)
+  - [Buckets](#buckets)
+  - [References](#references)
   - Demo App
-    - Add Cloud Storage to Firebase Project
+    - [Add Cloud Storage to Firebase Project](#demo-app-integrating-cloud-storage)
     - Using Cloud Storage in Web App
-- Authentication
-  - Tokens
+- [Authentication](#authentication)
+  - [Tokens](#tokens)
   - Security Rules
   - Demo App
     - Add Authentication
     - Work with Auth in Web App
     - Set up Security Rules
-- Firebase Hosting
+- [Firebase Hosting](#firebase-hosting)
   - Firebase CLI
   - Deploying
   - Demo App
@@ -256,6 +255,14 @@ Now that we've finished setting up our Firestore database, we can start to integ
 
 First, I am going to modify our `src/lib/firebase.js` file to create a reference to our database. I can do this by adding the following line: `export const db = firebase.firestore();`
 
+Now navigate to the `App.js` file and add the following line to the top of the file:
+
+```js
+import { db } from "./lib/firebase";
+```
+
+This will give us access to the database reference we created earlier.
+
 ### Listen for Realtime Updates
 
 First, we are going to set up a listener for the database. This will allow us to specify what actions to take whenever there are changes in the database.
@@ -377,7 +384,9 @@ const submitPost = (post) => {
 
 ### Deleting Data from the Database
 
-Lastly, let's set up the functionality to allow us to delete posts from the database. Go ahead and navigate to the `src/Post.jsx` file. Replace the current `deletePost()` implementation with the following code:
+Lastly, let's set up the functionality to allow us to delete posts from the database. Go ahead and navigate to the `src/Post.jsx` file. Once again add the `import {db} from './lib/firebase'` line at the top.
+
+Next, replace the current `deletePost()` implementation with the following code:
 
 ```js
 // delete post based on id
@@ -403,3 +412,155 @@ In order to have your project support user generated content such as images, vid
 Note that "user generated content" is distinct from media that already lives online. Cloud storage is relevant specifically for making files that only exist on your user's device available online.
 
 ## Buckets
+
+Cloud Storage stores all your files in Google Cloud Storage "buckets." Each of these buckets is structured like a hierarchical file system (not unlike the ones used on many desktop/laptop devices). This means that a bucket consists of folders, subfolders, and files
+
+## References
+
+Since Cloud Storage buckets are structured as file systems, the way we reference files is similar to how we use a filePath to reference files on our own devices.
+
+These references are then used to maniplate the contents of our buckets. We will see this in more detail when we go through the demo.
+
+# Demo App: Integrating Cloud Storage
+
+## Add Cloud Storage to Your Firebase Project
+
+Navigate to the **Storage** tab from your firebase console. Go ahead and click **Get Started** to set up Cloud Storage.
+
+![start-storage](./images/start-cloud-storage.png)
+
+We'll click through the next two steps, I will talk about the security rules soon.
+
+![add-storage](./images/add-storage-1.png)
+![add-storage](./images/add-storage-2.png)
+
+Once you've finished setup, you should see a page that looks like this:
+
+![add-folder](./images/add-folder-1.png)
+
+We're gonna go ahead and click the add folder button to create a place to store the images associated with our posts.
+
+![add-folder](./images/add-folder-2.png)
+
+Once you've created the folder, your page should look like this:
+
+![add-storage](./images/add-storage-3.png)
+
+The highlighted url is the location of your storage bucket. You can cross-reference this with the `config` object we created in `src\lib\firebase.js`
+
+### Previewing Security Rules
+
+So hopefully you noticed that while setting up Cloud Storage, there was a small note about configuring your security rules. We will be getting into the details of security rules a bit later on, but for now go ahead and navigate to the **Rules** tab and modify the default rules as shown below:
+
+![storage-rules](./images/storage-rules.png)
+
+Once you've changed to rules to allow anyone to read and write files to cloud storage, go ahead and publish them.
+
+## Using Cloud Storage in the App
+
+Now that we've finished setting up Cloud Storage, we can start to integrate it into our app!
+
+First, I am going to modify our `src/lib/firebase.js` file to give us access to the firebase storage object. I can do this by adding the following line: `export const storage = firebase.storage();`
+
+Now navigate to the `App.js` file and add the following line to the top of the file:
+
+```js
+import { db, storage } from "./lib/firebase";
+```
+
+We will now replace the `updatePOstCollection()` function from earlier to look like the following code:
+
+```js
+// Add a new document to our "posts" collection
+const updatePostCollection = (newPost) => {
+	db.collection("posts")
+		// 1 - Add post to Firestore database
+		.add({
+			author: newPost.author,
+			text: newPost.text,
+			timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+			profilePicURL: newPost.profilePicURL,
+			imageURL: newPost.imageFile ? LOADING_IMAGE_URL : null,
+		})
+		.then((docRef) => {
+			// Successful update
+			console.log("New document written with ID: ", docRef.id);
+			// 2 - Upload the image to Cloud Storage.
+			const file = newPost.imageFile;
+			if (!file) return;
+			var filePath = "post-images/" + docRef.id + "/" + file.name;
+			return storage
+				.ref(filePath)
+				.put(file)
+				.then((fileSnapshot) => {
+					// 3 - Generate a public URL for the file.
+					return fileSnapshot.ref.getDownloadURL().then((url) => {
+						// 4 - Update the placeholder with the image’s URL.
+						return docRef.update({
+							imageURL: url,
+							storageUri: fileSnapshot.metadata.fullPath,
+						});
+					});
+				});
+		})
+		.catch((error) => {
+			// Error while updating database
+			console.error(
+				"Error adding new document and/or uploading to Cloud storage: ",
+				error,
+			);
+		});
+};
+```
+
+Alright, wow, a lot of changes here. Our `updatePostCollection()` function is looking much more complicated. Let's break down what's going on here.
+
+```js
+db.collection("posts")
+			// 1 - Add post to Firestore database
+			.add({
+				author: newPost.author,
+				text: newPost.text,
+				timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+				profilePicURL: newPost.profilePicURL,
+				imageURL: newPost.imageFile ? LOADING_IMAGE_URL : null,
+			})
+			.then((docRef) => {
+				// Successful update
+        console.log("New document written with ID: ", docRef.id);
+```
+
+The above portion of the code is still the same, so we know it serves to update the firestore database with a new document with all the relevant fields.
+
+```js
+const file = newPost.imageFile;
+if (!file) return;
+var filePath = "post-images/" + docRef.id + "/" + file.name;
+```
+
+This portion of the code creates a `filePath` for the image file if the user selected one to upload. This `filePath` uses the name of the folder we created earlier "post-images" and concatenates it with the document id and the name of the file. So the final filePath will look something like this `post-images/your-doc-id/your-file-name`.
+
+```js
+return storage
+      .ref(filePath)
+      .put(file)
+      .then((fileSnapshot) => {
+        // 3 - Generate a public URL for the file.
+        return fileSnapshot.ref.getDownloadURL().then((url) => {
+          // 4 - Update the placeholder with the image’s URL.
+          return docRef.update({
+            imageURL: url,
+            storageUri: fileSnapshot.metadata.fullPath,
+          });
+        });
+      });
+  })
+```
+
+This portion of the code is where the bulk of the Cloud Storage work is happening. We use `storage.ref(filePath)` to create a **reference** to the specified `filePath` (which will exist in our bucket).
+
+The `.put(file)` method is then used to upload the file to Cloud Storage. Once it has successfully uploaded, we get access to a `fileSnapshot` in our callback. We'll use this snapshot to get the url needed to download the uploaded file.
+
+Basically, `fileSnapshot.ref.getDownloadURL()` gives us the online url we can use to access the file that was just uploaded to the Cloud. Once we have this url, we can finally update our document with the `imageURL`, which if you recall earlier had a placeholder `LOADING_IMAGE_URL`.
+
+Note: the storageUri gives us the bucket `filePath` which we created earlier.
