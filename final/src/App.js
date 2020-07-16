@@ -4,7 +4,8 @@ import Post from "./Post";
 import CreatePost from "./CreatePost";
 import Header from "./Header";
 
-import { db, storage } from "./lib/firebase";
+import firebase, { db, storage } from "./lib/firebase";
+import AuthProvider from "./AuthProvider";
 const LOADING_IMAGE_URL =
 	"https://breckenridge.skyrun.com/components/com_jomholiday/assets/images/04-spinner.gif";
 
@@ -34,6 +35,7 @@ function App() {
 					id: doc.id,
 					author: post.author,
 					text: post.text,
+					timestamp: post.timestamp,
 					profilePicURL: post.profilePicURL,
 					imageURL: post.imageURL,
 				};
@@ -56,6 +58,7 @@ function App() {
 			.add({
 				author: newPost.author,
 				text: newPost.text,
+				timestamp: firebase.firestore.FieldValue.serverTimestamp(),
 				profilePicURL: newPost.profilePicURL,
 				imageURL: newPost.imageFile ? LOADING_IMAGE_URL : null,
 			})
@@ -116,13 +119,15 @@ function App() {
 	};
 
 	return (
-		<div className="App">
-			<Header />
-			<div className="container">
-				<CreatePost submitPost={submitPost} />
-				{renderPosts()}
+		<AuthProvider>
+			<div className="App">
+				<Header />
+				<div className="container">
+					<CreatePost submitPost={submitPost} />
+					{renderPosts()}
+				</div>
 			</div>
-		</div>
+		</AuthProvider>
 	);
 }
 
