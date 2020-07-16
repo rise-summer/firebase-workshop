@@ -66,14 +66,14 @@ function CreatePost({ submitPost }) {
 					value={text}
 					onChange={handleChange}
 				/>
-				<img src={preview} className="post-image" />
+				<img src={preview} className="post-image" alt="" />
 				<div className="post-options">
 					<label
 						id="mediaCaptureLabel"
 						htmlFor="mediaCapture"
 						className="icon-container"
 					>
-						<i class="fas fa-image"></i>
+						<i className="fas fa-image"></i>
 						<p>Upload Photo</p>
 					</label>
 					<input

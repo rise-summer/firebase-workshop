@@ -17,7 +17,6 @@ function Post(props) {
 	};
 
 	const date = timestamp ? timestamp.toDate() : new Date();
-	console.log(date);
 	const time = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 
 	return (
@@ -31,10 +30,10 @@ function Post(props) {
 			</div>
 			<div className="post-body">
 				<p>{text}</p>
-				<img src={imageURL} className="post-image" />
+				<img src={imageURL} className="post-image" alt="" />
 			</div>
 			<div className="post-options">
-				<i class="fas fa-trash-alt" onClick={() => deletePost(id)}></i>
+				<i className="fas fa-trash-alt" onClick={() => deletePost(id)}></i>
 			</div>
 		</div>
 	);

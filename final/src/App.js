@@ -10,22 +10,14 @@ const LOADING_IMAGE_URL =
 	"https://breckenridge.skyrun.com/components/com_jomholiday/assets/images/04-spinner.gif";
 
 function App() {
-	const INITIAL_STATE = [
-		{
-			id: 0,
-			author: "Miles Wu",
-			text: "when you make an entire firebase workshop in a single day",
-			profilePicURL: null,
-			imageURL: "https://i.imgflip.com/3lqr77.jpg",
-		},
-	];
-
 	// set up state data for list of posts to render
+	const INITIAL_STATE = [];
 	const [postData, setPostData] = useState(INITIAL_STATE);
 
 	// Set up listener for changes to "posts" collection
 	const listenForPosts = () => {
-		const unsubscribe = db.collection("posts").onSnapshot((querySnapshot) => {
+		const query = db.collection("posts").orderBy("timestamp", "desc").limit(10);
+		const unsubscribe = query.onSnapshot((querySnapshot) => {
 			var postList = [];
 
 			// add each document in the "posts" collection to our "postList"
@@ -39,7 +31,7 @@ function App() {
 					profilePicURL: post.profilePicURL,
 					imageURL: post.imageURL,
 				};
-				console.log(newPost);
+
 				postList.push(newPost);
 			});
 
@@ -67,6 +59,7 @@ function App() {
 				console.log("New document written with ID: ", docRef.id);
 				// 2 - Upload the image to Cloud Storage.
 				const file = newPost.imageFile;
+				if (!file) return;
 				var filePath = "post-images/" + docRef.id + "/" + file.name;
 				return storage
 					.ref(filePath)

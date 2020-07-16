@@ -41,7 +41,7 @@ function Header() {
 			</div>
 			<div className="signin-options">
 				<button className="signin-btn" onClick={googleSignIn}>
-					<i class="fab fa-google"></i>
+					<i className="fab fa-google"></i>
 					{signedIn() ? <p>Sign Out</p> : <p>Sign In with Google</p>}
 				</button>
 			</div>
