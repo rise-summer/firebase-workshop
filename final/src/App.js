@@ -16,7 +16,10 @@ function App() {
 
 	// Set up listener for changes to "posts" collection
 	const listenForPosts = () => {
+		// query for the first 10 posts in order of timestamp
 		const query = db.collection("posts").orderBy("timestamp", "desc").limit(10);
+
+		// set up the callback to trigger on database changes
 		const unsubscribe = query.onSnapshot((querySnapshot) => {
 			var postList = [];
 
@@ -45,6 +48,23 @@ function App() {
 
 	// Add a new document to our "posts" collection
 	const updatePostCollection = (newPost) => {
+		// update state with new post
+		// setPostData((prev) => {
+		// 	return [
+		// 		{
+		// 			id: prev[0] ? prev[0].id + "1" : "1",
+		// 			author: newPost.author,
+		// 			text: newPost.text,
+		// 			timestamp: null,
+		// 			profilePicURL: newPost.profilePicURL,
+		// 			imageURL: newPost.imageFile
+		// 				? URL.createObjectURL(newPost.imageFile)
+		// 				: null,
+		// 		},
+		// 		...prev,
+		// 	];
+		// });
+
 		db.collection("posts")
 			// 1 - Add post to Firestore database
 			.add({
@@ -88,10 +108,7 @@ function App() {
 	const submitPost = (post) => {
 		if (post.text.length === 0) return;
 
-		setPostData((prev) => {
-			return [...prev, { ...post }];
-		});
-
+		// update database with new post
 		updatePostCollection(post);
 	};
 

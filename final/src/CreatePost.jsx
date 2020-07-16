@@ -13,6 +13,14 @@ function CreatePost({ submitPost }) {
 	const [postSubmission, setPostSubmission] = useState(INITIAL_STATE);
 
 	const handleSubmit = () => {
+		// reset form fields
+		setPostSubmission(INITIAL_STATE);
+
+		if (currentUser == null) {
+			window.alert("You must be signed in to make a post!");
+			return;
+		}
+		// submit form data to database
 		submitPost({
 			author: currentUser ? currentUser.displayName : "anonymous",
 			profilePicURL: currentUser
@@ -20,10 +28,6 @@ function CreatePost({ submitPost }) {
 				: PLACEHOLDER_PROFILE_PIC,
 			...postSubmission,
 		});
-
-		//TODO: Submit post data to firebase
-
-		setPostSubmission(INITIAL_STATE);
 	};
 
 	const handleChange = (event) => {
