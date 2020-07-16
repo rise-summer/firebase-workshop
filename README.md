@@ -564,3 +564,157 @@ The `.put(file)` method is then used to upload the file to Cloud Storage. Once i
 Basically, `fileSnapshot.ref.getDownloadURL()` gives us the online url we can use to access the file that was just uploaded to the Cloud. Once we have this url, we can finally update our document with the `imageURL`, which if you recall earlier had a placeholder `LOADING_IMAGE_URL`.
 
 Note: the storageUri gives us the bucket `filePath` which we created earlier.
+
+# Authentication
+
+If you plan at all to have any sort of user specific functionality in your application, it is highly likely you will need some form of authentication. Authentication helps you figure out if the current user is actually who they say they are. Accordingly, we can then choose what information to give them access to, allowing us to protect private data or actions.
+
+## How does Firebase Handle Authentication?
+
+Firebase integrates with a lot of existing authentication systems (e.g. OAuth) to give you options on how to handle Authentication in your application. It is often the case that Firebase takes an OAuth token, indicating a user has passed the credentials check, and then processes it on their servers to give the client an appropriate response.
+
+What does this mean for us though? Well, quite simply, we don't need to think too much about the systems in place to enable our Authentication. Firebase's servers will handle it for us. All we have to do is set up the credentials check and then we'll get a response with user information.
+
+## Firebase Security Rules
+
+To briefly go over Firebase Security Rules: security rules are a streamlined method to put checks and restrictions in place on your data. In a fairly intuitive way, they allow you to define under what conditions, users have access to reading and/or writing to your database and your cloud storage bucket.
+
+An important object that you have access to when setting security rules is the `request.auth` object. This object contains information about the current signed in user when a request is made. We can use this in tandem with Firebase Authentication to help set checks on what actions users are attempting to perform.
+
+# Demo App: Using Firebase Authentication
+
+## Add Auth to Firebase Project
+
+From your firebase console, navigate to the **Authentication** tab and click on **Sign-in method**.
+
+![start-auth](./images/start-authentication.png)
+
+We're gonna go ahead and use Google's sign in provider so click on Google and then **Enable** it.
+
+## Integrate Auth into the App
+
+There are actually two methods to integrate authentication to your applications with firebase. We will go over the more barebones approach, but I encourage you to look into [FirebaseUI](https://firebase.google.com/docs/auth/web/firebaseui) for your own projects as it is a very flexible and streamlined way to add authentication.
+
+To get started, navigate to your `src/lib/firebase.js` file and add the following line to get a reference to the auth object:
+
+```js
+export const auth = firebase.auth();
+```
+
+## Managing Users
+
+To effectively utilize the results of authentication, we will set up a way to keep track of the currently signed in user. Navigate to the `src/AuthProvider.jsx` file and add the following line to the top:
+
+```js
+import { auth } from "./lib/firebase";
+```
+
+Then, add the following code right under the TODO:
+
+```js
+// Track changes in AuthState
+useEffect(() => {
+	auth.onAuthStateChanged((user) => {
+		if (user) {
+			setCurrentUser(user);
+		} else {
+			setCurrentUser(null);
+		}
+	});
+}, []);
+```
+
+This sets up an AuthState listener, which will react whenever there are changes to the authenticated user (i.e. sign in, sign out, etc). The code above will set our current user state if a user is signed in. Otherwise, it will reset to null.
+
+## Setting up User Sign In/Sign Out
+
+Our sign in/sign out button is located in our app's header. Go ahead and navigate to the `src/Header.jsx` file so we can set that up.
+
+Replace the implementation of the `googleSignIn()` function with the following code:
+
+```js
+// Trigger on button click
+const googleSignIn = () => {
+	// sign out if signed in already
+	if (signedIn()) {
+		firebase
+			.auth()
+			.signOut()
+			.then(() => {
+				console.log("signed out");
+			})
+			.catch((error) => console.error(error));
+	} else {
+		// set up google sign in provider
+		var provider = new firebase.auth.GoogleAuthProvider();
+
+		// sign in with google
+		firebase
+			.auth()
+			.signInWithPopup(provider)
+			.then((result) => {
+				console.log(result.user);
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+};
+```
+
+Breaking down the above code we have two cases to handle: when user is already signed in and when a user is not signed in yet.
+
+If a user is already signed in we can use `firebase.auth().signOut()` to sign them out.
+
+If a user is not signed in, we set up the google sign in with the following line:
+
+```js
+var provider = new firebase.auth.GoogleAuthProvider();
+```
+
+Then we can use `firebase.auth().signInWithPopup(provider)` to trigger Google's sign in system.
+
+These changes are automatically reflected in our user state because of the `onAuthStateChanged` listener we set up earlier!
+
+## Using User Data
+
+Now that we've set up an auth state listener and provided a way to sign in/sign out, let's work with some of the user data we have access to.
+
+Go ahead and navigate to the `src/CreatePost.jsx` file which handles to creation of new posts. We can now edit the `handleSubmit()` function so that it utilizes our user-specific data.
+
+```js
+const handleSubmit = () => {
+	// reset form fields
+	setPostSubmission(INITIAL_STATE);
+
+	if (currentUser == null) {
+		window.alert("You must be signed in to make a post!");
+		return;
+	}
+	// submit form data to database
+	submitPost({
+		author: currentUser ? currentUser.displayName : "anonymous",
+		profilePicURL: currentUser ? currentUser.photoURL : PLACEHOLDER_PROFILE_PIC,
+		...postSubmission,
+	});
+};
+```
+
+Now, we should be able to sign in on our app, make a post, and have our user information be associated with that post.
+
+# Hosting
+
+Firebase also comes with built in hosting services. Once you are done with your application, you can easily and quickly deploy it online.
+
+Navigate over to the **Hosting** tab in the firebase console.
+
+![start-hosting](./images/start-hosting.png)
+
+Follow the bellow instructions to add firebase cli and deploy your application!
+
+We will use `yarn add firebase-tools` instead of what is shown below
+
+![add-hosting](./images/add-hosting-1.png)
+
+![add-hosting](./images/add-hosting-2.png)
+![add-hosting](./images/add-hosting-3.png)
