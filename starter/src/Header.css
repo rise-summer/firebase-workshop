@@ -1,0 +1,37 @@
+.Header {
+	width: 100vw;
+	height: 8vh;
+	background-color: rgb(255, 203, 48);
+	display: flex;
+	justify-content: space-between;
+	position: sticky;
+}
+
+.signin-options {
+	display: flex;
+	align-items: center;
+}
+
+.signin-btn {
+	height: 50%;
+	margin: 1em;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+}
+
+.signin-btn > * {
+	margin: 0 0.5em;
+}
+
+.brand {
+	padding: 1em;
+	color: white;
+	display: flex;
+	align-items: center;
+}
+
+.brand > p {
+	font-size: 2em;
+	font-weight: bold;
+}
