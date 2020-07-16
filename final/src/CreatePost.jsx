@@ -1,17 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "./AuthProvider";
+
+const PLACEHOLDER_PROFILE_PIC =
+	"https://w5insight.com/wp-content/uploads/2014/07/placeholder-user-400x400.png";
 
 function CreatePost({ submitPost }) {
+	const currentUser = useContext(AuthContext).currentUser;
 	const INITIAL_STATE = {
-		author: "Anonymous",
-		profilePic: null,
 		text: "",
-		file: null,
+		imageFile: null,
 	};
 	const [postSubmission, setPostSubmission] = useState(INITIAL_STATE);
 
 	const handleSubmit = () => {
-		console.log(postSubmission);
-		submitPost(postSubmission);
+		submitPost({
+			author: currentUser ? currentUser.displayName : "anonymous",
+			profilePicURL: currentUser
+				? currentUser.photoURL
+				: PLACEHOLDER_PROFILE_PIC,
+			...postSubmission,
+		});
 
 		//TODO: Submit post data to firebase
 
@@ -20,7 +28,7 @@ function CreatePost({ submitPost }) {
 
 	const handleChange = (event) => {
 		event.preventDefault();
-		console.log(event.target);
+
 		const target = event.target;
 		setPostSubmission((prev) => {
 			return {
@@ -37,12 +45,13 @@ function CreatePost({ submitPost }) {
 		setPostSubmission((prev) => {
 			return {
 				...prev,
-				file: URL.createObjectURL(file),
+				imageFile: file,
 			};
 		});
 	};
 
-	const { text, file } = postSubmission;
+	const { text, imageFile } = postSubmission;
+	const preview = imageFile ? URL.createObjectURL(imageFile) : null;
 
 	return (
 		<div className="Post">
@@ -57,14 +66,14 @@ function CreatePost({ submitPost }) {
 					value={text}
 					onChange={handleChange}
 				/>
-				<img src={file} className="post-image" />
-				<div className="post-details">
+				<img src={preview} className="post-image" alt="" />
+				<div className="post-options">
 					<label
 						id="mediaCaptureLabel"
 						htmlFor="mediaCapture"
 						className="icon-container"
 					>
-						<i class="fas fa-image"></i>
+						<i className="fas fa-image"></i>
 						<p>Upload Photo</p>
 					</label>
 					<input

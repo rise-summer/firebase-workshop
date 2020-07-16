@@ -57,6 +57,12 @@
 	margin-right: 0.5em;
 }
 
+.profile-pic {
+	max-width: 4em;
+	height: auto;
+	border-radius: 4px;
+}
+
 #post-text {
 	resize: none;
 	width: 100%;
@@ -65,7 +71,7 @@
 	box-sizing: border-box;
 }
 
-.post-details {
+.post-options {
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
@@ -74,7 +80,7 @@
 	padding: 0.5em 0;
 }
 
-.post-details > * {
+.post-options > * {
 	padding: 0 0.5em;
 	margin-left: 0.1em;
 	height: 90%;
